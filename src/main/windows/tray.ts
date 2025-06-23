@@ -21,7 +21,7 @@ export function setupAppFeatures(mainWindow: BrowserWindow): Tray | null {
       },
     },
   ])
-  trayInstance.setToolTip('SVNTool')
+  trayInstance.setToolTip('NumerologyTool')
   trayInstance.setContextMenu(contextMenu)
   trayInstance.on('click', () => {
     mainWindow?.show()
