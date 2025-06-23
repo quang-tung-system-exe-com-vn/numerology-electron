@@ -1,0 +1,3 @@
+type Configuration = {
+  openaiApiKey: string
+}

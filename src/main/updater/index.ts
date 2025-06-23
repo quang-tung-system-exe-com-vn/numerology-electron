@@ -1,0 +1,99 @@
+import type { BrowserWindow } from 'electron'
+import { app, ipcMain, Notification } from 'electron'
+import log from 'electron-log'
+import { autoUpdater } from 'electron-updater'
+import { getResourcePath } from 'main/utils/utils'
+import { IPC } from '../constants'
+import { updateAppStatus } from '../windows/overlayStateManager'
+
+const currentVersion = app.getVersion()
+log.transports.file.level = 'info'
+autoUpdater.logger = log
+autoUpdater.forceDevUpdateConfig = true
+autoUpdater.autoDownload = true
+autoUpdater.fullChangelog = true
+autoUpdater.requestHeaders = {
+  'Cache-Control': 'no-cache',
+}
+
+export function initAutoUpdater(window: BrowserWindow) {
+  autoUpdater.on('checking-for-update', () => {
+    window.webContents.send(IPC.UPDATER.STATUS, { status: 'checking' })
+  })
+
+  autoUpdater.on('update-available', info => {
+    log.info(`Update available: ${info.version}`)
+    window.webContents.send(IPC.UPDATER.STATUS, {
+      status: 'available',
+      version: info.version,
+      releaseNotes: info.releaseNotes,
+      currentVersion,
+    })
+  })
+
+  autoUpdater.on('update-not-available', () => {
+    updateAppStatus(false)
+    window.webContents.send(IPC.UPDATER.STATUS, { status: 'not-available' })
+  })
+
+  autoUpdater.on('error', err => {
+    updateAppStatus(false)
+    window.webContents.send(IPC.UPDATER.STATUS, { status: 'error', error: err.message })
+  })
+
+  autoUpdater.on('download-progress', progressObj => {
+    window.webContents.send(IPC.UPDATER.STATUS, {
+      status: 'downloading',
+      progress: progressObj.percent,
+    })
+  })
+
+  autoUpdater.on('update-downloaded', info => {
+    updateAppStatus(true)
+    const icon = getResourcePath('icon.ico')
+    const notification = new Notification({
+      title: 'Update Available',
+      body: `Version ${info.version} is available. It will be downloaded in the background.`,
+      icon: icon,
+    })
+    notification.show()
+    window.webContents.send(IPC.UPDATER.STATUS, {
+      status: 'downloaded',
+      version: info.version,
+      releaseNotes: info.releaseNotes,
+      currentVersion,
+    })
+  })
+
+  ipcMain.handle(IPC.UPDATER.GET_VERSION, () => {
+    return app.getVersion()
+  })
+
+  ipcMain.handle(IPC.UPDATER.CHECK_FOR_UPDATES, async () => {
+    try {
+      log.info('Manually checking for updates...')
+      const updateCheckResult = await autoUpdater.checkForUpdates()
+      if (updateCheckResult?.updateInfo) {
+        const currentVersion = app.getVersion()
+        const latestVersion = updateCheckResult.updateInfo.version
+        const releaseNotes = updateCheckResult.updateInfo.releaseNotes
+        const updateAvailable = latestVersion !== currentVersion
+        await autoUpdater.checkForUpdates()
+        return {
+          status: updateAvailable ? 'available' : 'not-available',
+          version: latestVersion,
+          releaseNotes,
+          currentVersion,
+        }
+      }
+      return { status: 'not-available' }
+    } catch (error) {
+      log.error('Error checking for updates:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IPC.UPDATER.INSTALL_UPDATES, () => {
+    autoUpdater.quitAndInstall(false, true)
+  })
+}

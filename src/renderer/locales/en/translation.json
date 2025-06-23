@@ -1,0 +1,88 @@
+{
+  "common": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "add": "Add",
+    "delete": "Delete",
+    "install": "Install",
+    "update": "Update",
+    "refresh": "Refresh",
+    "reload": "Reload",
+    "next": "Next",
+    "back": "Back",
+    "send": "Send",
+    "sending": "Sending...",
+    "copy": "Copy",
+    "noData": "No data available",
+    "skip": "Skip",
+    "finish": "Finish",
+    "startTour": "Start",
+    "dontShowAgain": "Don't show again",
+    "name": "Name",
+    "path": "Path",
+    "browse": "Browse"
+  },
+  "message": {
+    "loading": "Loading..."
+  },
+  "title": {
+    "settings": "Settings",
+    "about": "About",
+    "checkForUpdate": "Check For Updates",
+    "checkForUpdate1": "New update available! ({{0}})"
+  },
+  "toast": {
+    "success": "Success",
+    "error": "Error",
+    "info": "Info",
+    "warning": "Warning",
+    "configSaved": "Saved.",
+    "configSaveFailed": "Saved failed."
+  },
+  "settings": {
+    "fontSize": {
+      "title": "Font Size",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
+    },
+    "theme": "Theme",
+    "darkMode": "Dark Mode",
+    "language": "Language",
+    "buttonVariant": "Button Variant",
+    "fontFamily": "Font Family",
+    "description": "Customize your application settings.",
+    "tab": {
+      "appearance": "Appearance",
+      "configuration": "Configuration"
+    },
+    "configuration": {
+      "description": "Configure your project settings.",
+      "openaiApiKey": "OpenAI API Key",
+      "openaiApiKeyPlaceholder": "Enter your OpenAI API key",
+      "startOnLogin": "Auto-start SVNTool"
+    }
+  },
+  "dialog": {
+    "aboutDialog": {
+      "title": "SVN Tool",
+      "description": "This application is developed to assist in generating meaningful commit messages from SVN diffs and enforce coding standards.",
+      "developer": "Developer",
+      "version": "Version",
+      "email": "Email",
+      "thankYou": "Thank you for using this tool!",
+      "sourceCode": "Source Code"
+    },
+    "updateApp": {
+      "title": "New Update Available",
+      "appVersion": "A new version of SVNTool is available: ",
+      "message": "The app will relaunch after updating",
+      "description": "There's a new update for this app. Upgrade now to get the most recent features and fixes."
+    }
+  },
+  "welcome": {
+    "title": "Welcome to SVN Tool!",
+    "description": "It looks like this is your first time using the application. Would you like to take a quick tour to learn about the main features?"
+  }
+}
