@@ -105,7 +105,7 @@ export function MainPage() {
           <div className="flex justify-center gap-2">
             <Button
               id="generate-button"
-              // className={`relative ${isLoadingGenerate ? 'border-effect' : ''} ${isAnyLoading ? 'cursor-progress' : ''}`}
+              className={`relative border-effect`}
               variant={variant}
               onClick={() => {
                 // if (!isAnyLoading) {
