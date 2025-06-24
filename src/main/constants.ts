@@ -71,4 +71,6 @@ Deleted Files:
 
 Respond strictly in {language}, without using Markdown formatting.
 `,
+
+  NUMEROLOGY_INTERPRETATION: `{prompt}`,
 }
