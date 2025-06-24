@@ -1,11 +1,11 @@
 'use client'
-import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Button } from 'renderer/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from 'renderer/components/ui/dialog'
 import { ScrollArea } from 'renderer/components/ui/scroll-area'
+import { GlowLoader } from '../ui-elements/GlowLoader'
 
 interface NumerologyInterpretationDialogProps {
   open: boolean
@@ -44,27 +44,40 @@ export function NumerologyInterpretationDialog({ open, onOpenChange, title, data
 Vui lòng phân tích:
 1. Ý nghĩa cơ bản của con số ${number}
 2. Tác động khi con số này xuất hiện ${instances.length} lần
-3. Ảnh hưởng từ các nguồn khác nhau (${sources})
-4. Lời khuyên và hướng phát triển
+3. Biểu hiện tích cực & tiêu cực
+4. Ảnh hưởng từ các nguồn khác nhau (${sources})
 
-Trả lời bằng tiếng Việt một cách chi tiết và dễ hiểu.`
+Trả lời bằng tiếng Việt một cách chi tiết, có cấu trúc rõ ràng, chuyên nghiệp và dễ hiểu.`
     }
     const { fullName, birthDate, grid } = data
     const gridSummary = grid.map((cell: any) => `Số ${cell.number}: ${cell.instances.length} lần`).join(', ')
 
-    return `Hãy luận giải tổng quan thần số học Pythagoras cho:
+    return `Hãy luận giải tổng quan thần số học dựa theo nội dung của cuốn sách "THE COMPLETE BOOK OF NUMEROLOGY" của tác giả David a. Phillips cho:
+
 - Họ tên: ${fullName}
 - Ngày sinh: ${birthDate}
 - Phân bố các con số: ${gridSummary}
 
-Vui lòng phân tích:
-1. Tổng quan về tính cách và đặc điểm cá nhân
-2. Điểm mạnh và điểm cần phát triển
-3. Hướng nghề nghiệp phù hợp
-4. Mối quan hệ và tương tác xã hội
-5. Lời khuyên cho cuộc sống và phát triển bản thân
+Phân tích thần số dựa vào hướng dẫn sau:
+1. Phân tích mũi tên đúng nguyên tắc:
+Mũi tên ngang: 1-4-7 (thực tế), 2-5-8 (tinh thần), 3-6-9 (trí tuệ)
+Mũi tên dọc: 1-2-3 (lập kế hoạch), 4-5-6 (ý chí), 7-8-9 (hành động)
+Mũi tên chéo: 1-5-9 (quyết tâm), 3-5-7 (hoài nghi)
+2 .Ý nghĩa từng con số cụ thể:
+Phân tích chi tiết khi có số, thiếu số, hoặc có nhiều số
+Liên kết với tính cách và khả năng cá nhân
+3. Phương pháp phân tích có hệ thống:
+Bước 1: Xác định số có/thiếu
+Bước 2: Phân tích các mũi tên
+Bước 3: Tổng hợp đánh giá toàn diện theo mẫu dưới:
+- Tổng quan tính cách
+- Phân tích mũi tên đặc điểm
+- Điểm mạnh/yếu
+- Hướng nghề nghiệp
+- Mối quan hệ xã hội
+- Lời khuyên phát triển
 
-Trả lời bằng tiếng Việt một cách chi tiết, có cấu trúc rõ ràng và dễ hiểu.`
+Trả lời bằng tiếng Việt một cách chi tiết, có cấu trúc rõ ràng, chuyên nghiệp và dễ hiểu.`
   }
 
   const handleGetInterpretation = async () => {
@@ -108,7 +121,7 @@ Trả lời bằng tiếng Việt một cách chi tiết, có cấu trúc rõ r�
               <Button onClick={handleGetInterpretation} disabled={isLoading}>
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <GlowLoader className="mx-auto h-8 w-8 mb-4" />
                     Đang luận giải...
                   </>
                 ) : (
@@ -121,7 +134,7 @@ Trả lời bằng tiếng Việt một cách chi tiết, có cấu trúc rõ r�
           {isLoading && (
             <div className="flex items-center justify-center py-8">
               <div className="text-center">
-                <Loader2 className="mx-auto h-8 w-8 animate-spin mb-4" />
+                <GlowLoader className="mx-auto h-8 w-8 mb-4" />
                 <p>AI đang phân tích và luận giải...</p>
               </div>
             </div>
@@ -133,7 +146,6 @@ Trả lời bằng tiếng Việt một cách chi tiết, có cấu trúc rõ r�
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    // Tùy chỉnh styling cho các elements
                     h1: ({ children }) => <h1 className="text-xl font-bold mb-4 text-foreground">{children}</h1>,
                     h2: ({ children }) => <h2 className="text-lg font-semibold mb-3 text-foreground">{children}</h2>,
                     h3: ({ children }) => <h3 className="text-base font-medium mb-2 text-foreground">{children}</h3>,
@@ -163,7 +175,7 @@ Trả lời bằng tiếng Việt một cách chi tiết, có cấu trúc rõ r�
             <Button onClick={handleGetInterpretation} disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <GlowLoader className="" />
                   Đang luận giải lại...
                 </>
               ) : (
