@@ -176,7 +176,7 @@ export const TitleBar = () => {
             </div>
           </div>
         </div>
-
+        <div className="flex items-center font-bold text-xs">THẦN SỐ HỌC</div>
         <div className="flex gap-1 items-center justify-center h-full" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
           <button onClick={() => handleWindow('minimize')} className="w-10 h-8 flex items-center justify-center hover:bg-[var(--hover-bg)] hover:text-[var(--hover-fg)]">
             <Minus size={15.5} strokeWidth={1} absoluteStrokeWidth />

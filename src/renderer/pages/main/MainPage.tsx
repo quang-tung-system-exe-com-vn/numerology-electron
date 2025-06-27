@@ -1,17 +1,16 @@
 'use client'
 import { format } from 'date-fns'
-import { CalendarIcon, Sparkles } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { NumerologyInterpretationDialog } from 'renderer/components/dialogs/NumerologyInterpretationDialog'
 import { PYTHAGORAS_TABLE } from 'renderer/components/shared/constants'
 import { Button } from 'renderer/components/ui/button'
-import { Calendar } from 'renderer/components/ui/calendar'
 import { Card, CardContent } from 'renderer/components/ui/card'
 import { Input } from 'renderer/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from 'renderer/components/ui/popover'
 import { cn } from 'renderer/lib/utils'
 import { TitleBar } from 'renderer/pages/main/TitleBar'
 import { useButtonVariant } from 'renderer/stores/useAppearanceStore'
+import { GlowLoader } from '@/components/ui-elements/GlowLoader'
 
 interface NumerologyData {
   lastName: number[]
@@ -39,7 +38,7 @@ export function MainPage() {
   const variant = useButtonVariant()
 
   const [fullName, setFullName] = useState('')
-  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined)
+  const [birthDateString, setBirthDateString] = useState<string>('')
   const [numerologyData, setNumerologyData] = useState<NumerologyData | null>(null)
   const [grid, setGrid] = useState<GridCell[]>([])
 
@@ -73,8 +72,29 @@ export function MainPage() {
       .filter(n => n > 0)
   }
 
+  const handleBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/[^0-9]/g, '')
+
+    if (value.length > 2 && value.indexOf('/') === -1) {
+      value = `${value.substring(0, 2)}/${value.substring(2)}`
+    }
+    if (value.length > 5 && value.split('/').length < 3) {
+      value = `${value.substring(0, 5)}/${value.substring(5)}`
+    }
+
+    setBirthDateString(value.substring(0, 10))
+  }
+
   const calculateNumerology = () => {
-    if (!fullName.trim() || !birthDate) return
+    if (!fullName.trim() || !birthDateString) return
+
+    const [day, month, year] = birthDateString.split('/').map(Number)
+    const birthDate = new Date(year, month - 1, day)
+
+    if (Number.isNaN(birthDate.getTime())) {
+      console.error('Ngày sinh không hợp lệ')
+      return
+    }
 
     const nameParts = fullName
       .trim()
@@ -152,14 +172,9 @@ export function MainPage() {
     }
   }
 
-  const getCellBackgroundColor = (cell: GridCell): string => {
-    if (cell.instances.length === 0) return 'bg-[var(--background)]'
-    return 'bg-[var(--background)]'
-  }
-
   const resetForm = () => {
     setFullName('')
-    setBirthDate(undefined)
+    setBirthDateString('')
     setNumerologyData(null)
     setGrid([])
   }
@@ -174,7 +189,15 @@ export function MainPage() {
   }
 
   const handleGeneralInterpretation = () => {
-    if (!numerologyData || !birthDate) return
+    if (!numerologyData || !birthDateString) return
+
+    const [day, month, year] = birthDateString.split('/').map(Number)
+    const birthDate = new Date(year, month - 1, day)
+
+    if (Number.isNaN(birthDate.getTime())) {
+      console.error('Ngày sinh không hợp lệ khi luận giải tổng quan')
+      return
+    }
 
     const data = {
       fullName,
@@ -211,23 +234,13 @@ export function MainPage() {
                     <label htmlFor="fullName" className="text-sm font-medium">
                       Họ và tên đầy đủ
                     </label>
-                    <Input id="fullName" placeholder="VD: Nguyễn Quang Tùng" value={fullName} onChange={e => setFullName(e.target.value)} />
+                    <Input id="fullName" spellCheck={false} placeholder="VD: Nguyễn Quang Tùng" value={fullName} onChange={e => setFullName(e.target.value)} />
                   </div>
                   <div className="flex-none w-[140px]">
-                    <label htmlFor="birthDate" className="text-sm font-medium">
+                    <label htmlFor="birthDateInput" className="text-sm font-medium">
                       Ngày sinh
                     </label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className={cn('w-full justify-start text-left font-normal', !birthDate && 'text-muted-foreground')}>
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {birthDate ? format(birthDate, 'dd/MM/yyyy') : 'Chọn ngày sinh'}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar mode="single" selected={birthDate} onSelect={setBirthDate} captionLayout="dropdown" animate={true} />
-                      </PopoverContent>
-                    </Popover>
+                    <Input id="birthDateInput" spellCheck={false} placeholder="dd/mm/yyyy" value={birthDateString} onChange={handleBirthDateChange} maxLength={10} />
                   </div>
                   <div className="flex gap-2 flex-none">
                     <Button onClick={calculateNumerology} variant={variant}>
@@ -250,7 +263,7 @@ export function MainPage() {
                       {numerologyData?.letterData?.lastNameLetters.map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex flex-col items-center bg-white dark:bg-blue-950 rounded-md border border-blue-300 dark:border-blue-700 duration-500 p-1 shadow-sm hover:shadow-lg transition-all"
+                          className="flex flex-col items-center bg-white dark:bg-neutral-800 rounded-md border border-blue-300 dark:border-blue-700 duration-500 p-1 shadow-sm hover:shadow-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer transition-all"
                         >
                           <div className="text-md font-bold text-blue-800 dark:text-blue-200">{item.letter}</div>
                           <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">{item.number}</div>
@@ -262,7 +275,7 @@ export function MainPage() {
                         numerologyData.letterData.middleNameLetters.map((item, idx) => (
                           <div
                             key={idx}
-                            className="flex flex-col items-center bg-white dark:bg-blue-950 rounded-md border border-blue-300 dark:border-blue-700 duration-500 p-1 shadow-sm hover:shadow-lg transition-all"
+                            className="flex flex-col items-center bg-white dark:bg-neutral-800 rounded-md border border-blue-300 dark:border-blue-700 duration-500 p-1 shadow-sm hover:shadow-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer transition-all"
                           >
                             <div className="text-md font-bold text-blue-800 dark:text-blue-200">{item.letter}</div>
                             <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">{item.number}</div>
@@ -272,7 +285,7 @@ export function MainPage() {
                       {numerologyData?.letterData?.firstNameLetters?.map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex flex-col items-center bg-white dark:bg-green-950 rounded-md border border-green-300 dark:border-green-700 duration-500 p-1 shadow-sm hover:shadow-lg transition-all"
+                          className="flex flex-col items-center bg-white dark:bg-neutral-800 rounded-md border border-green-300 dark:border-green-700 duration-500 p-1 shadow-sm hover:shadow-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer transition-all"
                         >
                           <div className="text-md font-bold text-green-800 dark:text-green-200">{item.letter}</div>
                           <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">{item.number}</div>
@@ -284,7 +297,7 @@ export function MainPage() {
                       {numerologyData?.birthDate.map((num, idx) => (
                         <div
                           key={idx}
-                          className="flex h-[63px] items-center bg-white dark:bg-red-950 rounded-md border border-red-300 dark:border-red-700 duration-500 p-1 shadow-sm hover:shadow-lg transition-all"
+                          className="flex h-[63px] items-center bg-white dark:bg-neutral-800 rounded-md border border-red-300 dark:border-red-700 duration-500 p-1 shadow-sm hover:shadow-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer transition-all"
                         >
                           <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold">{num}</div>
                         </div>
@@ -299,10 +312,10 @@ export function MainPage() {
             <Card className="h-full py-4">
               <CardContent className="px-4 h-full">
                 {!numerologyData ? (
-                  <div className="flex items-center justify-center h-full text-gray-500">Nhập thông tin và nhấn "Tính toán" để xem biểu đồ thần số học</div>
+                  <div className="flex items-center justify-center h-full font-bold text-gray-500">Nhập thông tin và nhấn "Tính toán" để xem biểu đồ thần số học</div>
                 ) : (
                   <div className="space-y-4 h-[calc(100%-3rem)] m-auto">
-                    <div className="flex flex-row flex-wrap justify-between w-full h-full gap-2">
+                    <div className="flex flex-wrap justify-between w-full h-full">
                       {gridLayout.map((row, rowIndex) =>
                         row.map((number, colIndex) => {
                           const cell = getGridCellByNumber(number)
@@ -314,14 +327,13 @@ export function MainPage() {
                               type="button"
                               disabled={cell.instances.length === 0}
                               className={cn(
-                                'w-[32.5%] border-1 rounded-md flex flex-col items-center justify-center text-center p-2 transition-all duration-500 shadow-sm hover:shadow-md',
-                                getCellBackgroundColor(cell),
+                                'w-1/3 bg-[var(--background)] p-1',
                                 cell.instances.length > 0 ? 'cursor-pointer border-gray-300 dark:border-gray-600' : 'cursor-default opacity-90 border-gray-200 dark:border-gray-900'
                               )}
                               onClick={() => handleCellClick(cell)}
                             >
                               {cell.instances.length > 0 ? (
-                                <div className="flex flex-wrap gap-1 justify-center">
+                                <div className="flex flex-wrap gap-1 justify-center items-center border-1 rounded-md transition-all duration-500 shadow-sm hover:shadow-md hover:bg-neutral-100 dark:hover:bg-neutral-800 h-full w-full">
                                   {cell.instances.map((instance, idx) => (
                                     <span key={idx} className={cn('text-md font-bold px-2 py-0.5 rounded-sm', getNumberColor(instance.source))}>
                                       {instance.value}
@@ -339,7 +351,7 @@ export function MainPage() {
                     {/* Button Luân giải chung */}
                     {numerologyData && (
                       <div className="flex justify-center">
-                        <Button onClick={handleGeneralInterpretation} variant={variant} size="lg" className="gap-2">
+                        <Button onClick={handleGeneralInterpretation} variant={variant} size="lg" className="relative border-effect">
                           <Sparkles className="h-5 w-5" />
                           Luận giải
                         </Button>

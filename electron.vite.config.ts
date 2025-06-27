@@ -1,9 +1,8 @@
 import { dirname, normalize, resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
+import reactPlugin from '@vitejs/plugin-react'
 import { codeInspectorPlugin } from 'code-inspector-plugin'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
-
-import reactPlugin from '@vitejs/plugin-react'
 import injectProcessEnvPlugin from 'rollup-plugin-inject-process-env'
 import tsconfigPathsPlugin from 'vite-tsconfig-paths'
 
